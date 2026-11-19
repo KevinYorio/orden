@@ -1,0 +1,17 @@
+node_modules/
+dist/
+apps/web/build/
+.env
+.env.*
+!.env.example
+*.sqlite*
+*.db*
+data/
+sessions/
+backups/
+*.log
+*.pid
+coverage/
+.npm-cache/
+.test-data/
+.browser-profile/

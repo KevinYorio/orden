@@ -1,0 +1,43 @@
+{
+  "name": "asistente-hogar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.13.0 <25"
+  },
+  "scripts": {
+    "dev": "tsx watch apps/service/src/main.ts",
+    "build": "tsc -p tsconfig.build.json && vite build --config apps/web/vite.config.ts && node scripts/build-assets.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "start": "node --env-file-if-exists=.env dist/apps/service/src/main.js",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build",
+    "setup": "node scripts/setup.mjs",
+    "telegram:identify": "node --env-file-if-exists=.env scripts/telegram-identify.mjs",
+    "control": "node --env-file-if-exists=.env --import tsx apps/service/src/cli.ts",
+    "whatsapp:verify": "node scripts/verify-whatsapp.mjs"
+  },
+  "dependencies": {
+    "@fastify/static": "10.1.11",
+    "@napi-rs/canvas": "1.1.1",
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "fastify": "^5.6.2",
+    "luxon": "^3.7.2",
+    "pdfjs-dist": "6.5.438",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.1",
+    "@types/node": "^24.9.1",
+    "@types/qrcode": "1.5.6",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "qrcode": "1.5.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vite": "7.3.8"
+  }
+}

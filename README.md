@@ -81,4 +81,3 @@ El Dockerfile prepara Linux/Railway; construirlo no despliega. La operación rem
 - [Operación ORDEN 4.0 (borrador)](docs/ORDEN_4_OPERACION.md) · [Estado inicial histórico](docs/ORDEN_4_ESTADO.md) · [Estado actual](docs/ORDEN_4_ESTADO_ACTUAL.md)
 
 No iniciar dos instalaciones por copiar una SQLite o una sesión. Usar el procedimiento de traspaso; una caché del tablero no otorga propiedad.
-

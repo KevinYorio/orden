@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT NOT NULL CHECK(json_valid(value)));
+CREATE TABLE IF NOT EXISTS records(id TEXT PRIMARY KEY,kind TEXT NOT NULL,status TEXT NOT NULL CHECK(status IN ('active','resolved','cancelled')),version INTEGER NOT NULL CHECK(version>0),payload TEXT NOT NULL CHECK(json_valid(payload)));
+CREATE INDEX IF NOT EXISTS record_kind_status ON records(kind,status);
+CREATE TABLE IF NOT EXISTS inbox(id TEXT PRIMARY KEY,author TEXT NOT NULL,at TEXT NOT NULL,payload TEXT NOT NULL CHECK(json_valid(payload)));
+CREATE TABLE IF NOT EXISTS drafts(id TEXT PRIMARY KEY,author TEXT NOT NULL,message_id TEXT NOT NULL REFERENCES inbox(id),at TEXT NOT NULL,payload TEXT NOT NULL,question TEXT NOT NULL,followups INTEGER NOT NULL DEFAULT 0 CHECK(followups IN (0,1)),status TEXT NOT NULL DEFAULT 'open');
+CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,record_id TEXT NOT NULL REFERENCES records(id),version INTEGER NOT NULL,due TEXT NOT NULL,state TEXT NOT NULL DEFAULT 'pending');
+CREATE INDEX IF NOT EXISTS jobs_due ON jobs(state,due);
+CREATE TABLE IF NOT EXISTS outbox(id TEXT PRIMARY KEY,record_id TEXT REFERENCES records(id),version INTEGER,payload TEXT NOT NULL,state TEXT NOT NULL DEFAULT 'pending' CHECK(state IN ('pending','sending','sent','cancelled','delivery_unknown','failed')),attempts INTEGER NOT NULL DEFAULT 0,next_at TEXT NOT NULL,evidence TEXT);
+CREATE TABLE IF NOT EXISTS payments(id TEXT PRIMARY KEY,record_id TEXT NOT NULL REFERENCES records(id),amount INTEGER CHECK(amount IS NULL OR amount>0),currency TEXT NOT NULL CHECK(currency IN ('ARS','USD')),at TEXT NOT NULL,author TEXT NOT NULL,performed_by TEXT NOT NULL,account_id TEXT,parts TEXT NOT NULL DEFAULT '[]',financial_kind TEXT NOT NULL DEFAULT 'expense');
+CREATE TABLE IF NOT EXISTS accounts(id TEXT PRIMARY KEY,name TEXT NOT NULL,currency TEXT NOT NULL CHECK(currency IN ('ARS','USD')),opening_amount INTEGER,opening_at TEXT,card INTEGER NOT NULL DEFAULT 0,config TEXT NOT NULL DEFAULT '{}');
+CREATE TABLE IF NOT EXISTS blobs(hash TEXT PRIMARY KEY,size INTEGER NOT NULL CHECK(size>0),present INTEGER NOT NULL DEFAULT 1,local_copy INTEGER NOT NULL DEFAULT 0,deleted_at TEXT);
+CREATE TABLE IF NOT EXISTS documents(id TEXT PRIMARY KEY,hash TEXT NOT NULL REFERENCES blobs(hash),name TEXT NOT NULL,mime TEXT NOT NULL,purpose TEXT NOT NULL,at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS document_links(document_id TEXT NOT NULL REFERENCES documents(id),record_id TEXT NOT NULL REFERENCES records(id),PRIMARY KEY(document_id,record_id));
+CREATE TABLE IF NOT EXISTS pending_attachments(id TEXT PRIMARY KEY,author TEXT NOT NULL,payload TEXT NOT NULL,at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS audit(seq INTEGER PRIMARY KEY AUTOINCREMENT,at TEXT NOT NULL,actor TEXT NOT NULL,action TEXT NOT NULL,record_id TEXT,detail TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS cost_samples(id INTEGER PRIMARY KEY,at TEXT NOT NULL,payload TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS snapshots(id TEXT PRIMARY KEY,at TEXT NOT NULL,generation INTEGER NOT NULL,cursor INTEGER NOT NULL,hash TEXT NOT NULL,purpose TEXT NOT NULL);

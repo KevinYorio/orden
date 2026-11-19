@@ -1,0 +1,13 @@
+node_modules
+.npm-cache
+.env*
+!.env.example
+dist
+apps/web/build
+tests
+.test-data
+*.sqlite*
+data
+backups
+sessions
+.git
